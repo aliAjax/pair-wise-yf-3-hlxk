@@ -1,18 +1,20 @@
 import type { SmellMemory } from '../utils/constants';
 import { getSeasonInfo, getSmellTypeInfo, getEmotionInfo } from '../utils/constants';
 import { formatDate, contrastTextColor } from '../utils/helpers';
-import { Pencil, Trash2, ChevronDown, ChevronUp, Heart } from 'lucide-react';
+import { Pencil, Trash2, ChevronDown, ChevronUp, Heart, Check } from 'lucide-react';
 
 interface Props {
   memory: SmellMemory;
   index: number;
   isExpanded: boolean;
+  isSelected: boolean;
+  onSelect: () => void;
   onToggle: () => void;
   onEdit: () => void;
   onDelete: () => void;
 }
 
-export default function MemoryCard({ memory, index, isExpanded, onToggle, onEdit, onDelete }: Props) {
+export default function MemoryCard({ memory, index, isExpanded, isSelected, onSelect, onToggle, onEdit, onDelete }: Props) {
   const season = getSeasonInfo(memory.season);
   const stype = getSmellTypeInfo(memory.smell_type);
   const emotion = getEmotionInfo(memory.emotion);
@@ -22,9 +24,24 @@ export default function MemoryCard({ memory, index, isExpanded, onToggle, onEdit
 
   return (
     <article
-      className="group relative bg-paper-50 rounded-2xl border border-paper-300 shadow-card overflow-hidden hover:shadow-paper-hover hover:-translate-y-1 transition-all duration-300 animate-fadeInUp"
+      className={`group relative bg-paper-50 rounded-2xl border shadow-card overflow-hidden hover:shadow-paper-hover hover:-translate-y-1 transition-all duration-300 animate-fadeInUp ${
+        isSelected ? 'border-ochre-400 ring-2 ring-ochre-400/60' : 'border-paper-300'
+      }`}
       style={{ animationDelay: `${Math.min(index * 60, 600)}ms` }}
     >
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onSelect(); }}
+        aria-pressed={isSelected}
+        title={isSelected ? '取消勾选' : '勾选以合并'}
+        className={`absolute top-3 left-3 z-10 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 shadow-sm ${
+          isSelected
+            ? 'bg-ochre-500 border-ochre-600 text-paper-50 scale-110'
+            : 'bg-paper-50/90 border-paper-400 text-transparent hover:border-ochre-400 hover:text-ochre-300'
+        }`}
+      >
+        <Check className="w-3.5 h-3.5" strokeWidth={3} />
+      </button>
       <div className="flex">
         <div
           className="w-2 shrink-0 relative overflow-hidden transition-all duration-300 group-hover:w-3"
@@ -36,7 +53,7 @@ export default function MemoryCard({ memory, index, isExpanded, onToggle, onEdit
 
         <div className="flex-1 min-w-0">
           <div
-            className="p-4 pb-3 cursor-pointer select-none"
+            className="p-4 pb-3 pl-11 cursor-pointer select-none"
             onClick={onToggle}
           >
             <div className="flex items-start justify-between gap-2 mb-2">
